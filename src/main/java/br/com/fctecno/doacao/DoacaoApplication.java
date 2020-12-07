@@ -1,4 +1,4 @@
-package br.com.fctecno;
+package br.com.fctecno.doacao;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
