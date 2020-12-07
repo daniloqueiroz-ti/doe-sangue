@@ -11,7 +11,7 @@
 	<groupId>br.com.fctecno</groupId>
 	<artifactId>doacao</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>doacao</name>
+	<name>Doe Sangue</name>
 	<description>Test Citel Soft</description>
 
 	<properties>
