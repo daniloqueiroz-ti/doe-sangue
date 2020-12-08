@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,11 +14,16 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import org.springframework.lang.NonNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -28,35 +34,46 @@ public class Doador {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Size(max = 255)
 	private String nome;	
 	
+	@Size(max = 14)
 	private String cpf;
+	
+	@Size(max = 25)
 	private String rg;
 	
-	@Column(name = "data_nasc")
+	@Column(name = "data_nasc", nullable = false, length = 10)
 	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern="dd/MM/yyyy")
 	private Date dataNasc;
 	
-	@JsonProperty(access = Access.READ_ONLY)
-	private Integer idade;
-	
+	@Size(max = 25)
 	private String sexo;
+	
+	@Size(max = 255)
 	private String mae;
+	
+	@Size(max = 255)
 	private String pai;
+	
+	@Size(max = 100)
+	@NotBlank(message = "Email é obrigatório")
+	@Email
 	private String email;
 	
-	
-	private String cep;
-	private String endereco;
-	private Integer numero;
-	private String bairro;
-	private String cidade;
-	private String estado;
+	@OneToOne(cascade = CascadeType.ALL)
+	private Endereco endereco;
 	
 	@Column(name = "telefone_fixo")
+	@Size(max = 14)
 	private String telefoneFixo;
+	
+	@Size(max = 15)
 	private String celular;
+	
 	private BigDecimal altura;
+	
 	private BigDecimal peso;
 	
 	@NonNull
@@ -70,28 +87,27 @@ public class Doador {
 	@JsonProperty(access = Access.READ_ONLY)
 	private boolean apto;
 	
+	@JsonProperty(access = Access.READ_ONLY)
+	private Integer idade;
+	
 
 	public Integer getIdade() {
 		return idade;
 	}
 
-	public void setIdade(Integer idade) {
-		this.idade = Doador.calculaIdade(this.dataNasc);
+	public void setIdade() {
+		this.idade = Doador.calculaIdade(this.getDataNasc());
 	}
 
 	public boolean isApto() {
-		if (this.getIdade() < 16 || this.getIdade() > 69)
-			return false;
-		
-		if (this.peso.compareTo(new BigDecimal(50.0)) == 1) {
-			return false;
-		}
-		
-		return true;
+		return this.apto;
 	}
 
-	public void setApto(boolean apto) {
-		this.apto = apto;
+	public void setApto() {
+		if ((this.getIdade() < 16 || this.getIdade() > 69) && (this.getPeso().compareTo(new BigDecimal(50.0)) == 1))
+			this.apto = false;		
+		else
+			this.apto = true;
 	}
 
 	public Long getId() {
@@ -166,52 +182,12 @@ public class Doador {
 		this.email = email;
 	}
 
-	public String getCep() {
-		return cep;
-	}
-
-	public void setCep(String cep) {
-		this.cep = cep;
-	}
-
-	public String getEndereco() {
+	public Endereco getEndereco() {
 		return endereco;
 	}
 
-	public void setEndereco(String endereco) {
+	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
-	}
-
-	public Integer getNumero() {
-		return numero;
-	}
-
-	public void setNumero(Integer numero) {
-		this.numero = numero;
-	}
-
-	public String getBairro() {
-		return bairro;
-	}
-
-	public void setBairro(String bairro) {
-		this.bairro = bairro;
-	}
-
-	public String getCidade() {
-		return cidade;
-	}
-
-	public void setCidade(String cidade) {
-		this.cidade = cidade;
-	}
-
-	public String getEstado() {
-		return estado;
-	}
-
-	public void setEstado(String estado) {
-		this.estado = estado;
 	}
 
 	public String getTelefoneFixo() {
@@ -258,9 +234,10 @@ public class Doador {
 		return imc;
 	}
 
-	public void setImc(BigDecimal imc) {
-		BigDecimal altura  = this.altura.multiply(this.altura);
-		this.imc = this.peso.divide(altura).setScale(2, RoundingMode.HALF_EVEN);  
+	public void setImc() {
+		BigDecimal altura  = this.getAltura().multiply(this.getAltura());
+		System.out.println(altura);
+		this.imc = this.getPeso().divide(altura, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_EVEN);  
 	}
 
 	@Override
@@ -300,12 +277,19 @@ public class Doador {
 
 		dateOfBirth.add(Calendar.YEAR, age);
 
-
 		if (today.before(dateOfBirth)) {
 			age--;
 		}
 
 		return age;
 	}
+
+	
+	public void setData() {
+		this.setIdade();
+		this.setApto();
+		this.setImc();
+	}
+
 	
 }

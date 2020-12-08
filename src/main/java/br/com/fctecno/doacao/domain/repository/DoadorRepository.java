@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import br.com.fctecno.doacao.domain.model.Doador;
 
 @Repository
-public interface DoacaoRepository extends JpaRepository<Doador, Long> {
+public interface DoadorRepository extends JpaRepository<Doador, Long> {
 
 }
