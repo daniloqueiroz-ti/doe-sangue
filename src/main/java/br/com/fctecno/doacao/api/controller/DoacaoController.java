@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ import br.com.fctecno.doacao.domain.repository.DoadorRepository;
 import br.com.fctecno.doacao.domain.service.DoacaoService;
 
 @RestController
-@RequestMapping("/doacoes")
+@RequestMapping("/api/doacoes")
 public class DoacaoController {
 
 	@Autowired
@@ -39,10 +40,12 @@ public class DoacaoController {
 		produces = "application/json; charset=utf-8" 
 	)
 	public void adicionarTodos(@Valid @RequestBody List<DoacaoInput> doacoes) {
-		for(Doador doador : toCollectionModel(doacoes)) {			
+		for(Doador doador : toCollectionModel(doacoes)) {
+			
+			System.out.println(doador.toString());
+			
 			service.salvar(doador);
 		}
-
 	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
@@ -55,7 +58,7 @@ public class DoacaoController {
 	}
 	
 	private Doador toModel(DoacaoInput doador) {
-		//modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 		return modelMapper.map(doador, Doador.class);
 	}
 	

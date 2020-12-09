@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import org.springframework.lang.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import br.com.fctecno.doacao.domain.model.TipoSanguineo;
 
@@ -30,6 +31,7 @@ public class DoacaoInput {
 	@Temporal(TemporalType.DATE)
 	@NotBlank
 	@JsonFormat(pattern="dd/MM/yyyy")
+	@JsonProperty("data_nasc")
 	private Date dataNasc;
 	
 	@NotBlank
@@ -42,7 +44,7 @@ public class DoacaoInput {
 	private String pai;
 	
 	@NotBlank
-	@Email
+	//@Email
 	private String email;
 	
 	@NonNull
@@ -64,6 +66,7 @@ public class DoacaoInput {
 	private String estado;
 	
 	@NotBlank
+	@JsonProperty("telefone_fixo")
 	private String telefoneFixo;
 	
 	@NotBlank
@@ -77,6 +80,7 @@ public class DoacaoInput {
 	
 	@NotBlank
 	@Enumerated(EnumType.STRING)
+	@JsonProperty("tipo_sanguineo")
 	private TipoSanguineo tipoSanguineo;
 	
 	

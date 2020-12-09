@@ -114,6 +114,12 @@ public class Endereco {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Endereco [id=" + id + ", doador=" + doador + ", cep=" + cep + ", endereco=" + endereco + ", numero="
+				+ numero + ", bairro=" + bairro + ", cidade=" + cidade + ", estado=" + estado + "]";
+	}
 	
 	
 }

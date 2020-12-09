@@ -14,6 +14,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -58,8 +60,8 @@ public class Doador {
 	private String pai;
 	
 	@Size(max = 100)
-	@NotBlank(message = "Email é obrigatório")
-	@Email
+	//@NotBlank
+	//@Email
 	private String email;
 	
 	@OneToOne(cascade = CascadeType.ALL)
@@ -81,6 +83,10 @@ public class Doador {
 	@Column(name = "tipo_sanguineo")
 	private TipoSanguineo tipoSanguineo;
 	
+	@ManyToOne
+	@JoinColumn(name = "arquivo_id")
+	private File file;
+	
 	@JsonProperty(access = Access.READ_ONLY)
 	private BigDecimal imc;
 	
@@ -90,6 +96,16 @@ public class Doador {
 	@JsonProperty(access = Access.READ_ONLY)
 	private Integer idade;
 	
+	public Doador() {
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
 
 	public Integer getIdade() {
 		return idade;
@@ -289,6 +305,14 @@ public class Doador {
 		this.setIdade();
 		this.setApto();
 		this.setImc();
+	}
+
+	@Override
+	public String toString() {
+		return "Doador [id=" + id + ", nome=" + nome + ", cpf=" + cpf + ", rg=" + rg + ", dataNasc=" + dataNasc
+				+ ", sexo=" + sexo + ", mae=" + mae + ", pai=" + pai + ", email=" + email + ", endereco=" + endereco
+				+ ", telefoneFixo=" + telefoneFixo + ", celular=" + celular + ", altura=" + altura + ", peso=" + peso
+				+ ", tipoSanguineo=" + tipoSanguineo + ", imc=" + imc + ", apto=" + apto + ", idade=" + idade + "]";
 	}
 
 	
