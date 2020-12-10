@@ -1,8 +1,10 @@
 package br.com.fctecno.doacao.api.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.Tuple;
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fctecno.doacao.api.model.DoacaoInput;
 import br.com.fctecno.doacao.domain.model.Doador;
+import br.com.fctecno.doacao.domain.model.Response;
 import br.com.fctecno.doacao.domain.repository.DoadorRepository;
 import br.com.fctecno.doacao.domain.service.DoacaoService;
 
@@ -42,8 +45,6 @@ public class DoacaoController {
 	public void adicionarTodos(@Valid @RequestBody List<DoacaoInput> doacoes) {
 		for(Doador doador : toCollectionModel(doacoes)) {
 			
-			System.out.println(doador.toString());
-			
 			service.salvar(doador);
 		}
 	}
@@ -57,15 +58,43 @@ public class DoacaoController {
 		return repo.save(doacao);
 	}
 	
+	@RequestMapping(
+		method = RequestMethod.GET
+	)
+	public List<List<Response>> resultados()
+	{
+		List<List<Response>> result = new ArrayList<>();
+		
+		
+		List<Response> lista = repo.qtdeDoadorByEstado();
+		List<Response> lista2  = repo.percentObesosBySexo();
+		List<Response> lista3  = repo.avgIdadeByTipoSanguineo();
+		List<Response> lista4 =  service.qtdePossiveisdoadores();
+		List<Response> lista5  = toCollectionResult(repo.avgImcByFaixaIdade());
+		result = List.of(lista, lista2, lista3, lista4, lista5);
+		
+		return result;
+	}
 	private Doador toModel(DoacaoInput doador) {
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 		return modelMapper.map(doador, Doador.class);
 	}
 	
-	private List<Doador> toCollectionModel(List<DoacaoInput> doadores) {
-		return doadores.stream()
+	private Response toModel(Tuple item) {
+		return new Response(item.get("informacao").toString(), item.get("valor").toString());
+	}
+	
+	private List<Doador> toCollectionModel(List<DoacaoInput> lista) {
+		return lista.stream()
 				.map(doador -> toModel(doador))
 				.collect(Collectors.toList());
+	}
+	
+	private List<Response> toCollectionResult(List<Tuple> lista) {
+		return lista.stream()
+				.map(doador -> toModel(doador))
+				.collect(Collectors.toList());
+		
 	}
 	
 }

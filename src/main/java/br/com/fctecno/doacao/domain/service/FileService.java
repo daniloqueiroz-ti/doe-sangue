@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.fctecno.doacao.api.model.DataResponse;
 import br.com.fctecno.doacao.api.model.DoacaoInput;
 import br.com.fctecno.doacao.domain.exception.FileException;
 import br.com.fctecno.doacao.domain.model.Doador;
@@ -56,7 +55,7 @@ public class FileService {
 		}
 	}
 	
-	public DataResponse storeFile(MultipartFile file) {
+	public String storeFile(MultipartFile file) {
 			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 		
 		try {
@@ -73,8 +72,9 @@ public class FileService {
 			
 			File saved = fileRepository.save(f);
 			
-			return this.processaArquivo(file.getInputStream(), saved);
+			this.processaArquivo(file.getInputStream(), saved);
 			
+			return fileName;
 			
 		} catch (Exception e) {
 			throw new FileException("Could not store file " + fileName + ". Please try again!", e);
@@ -82,7 +82,7 @@ public class FileService {
 		
 	}
 	
-	public DataResponse processaArquivo(InputStream data, File file) throws JSONException {
+	private void processaArquivo(InputStream data, File file) throws JSONException {
 		
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data, StandardCharsets.UTF_8));
 		
@@ -92,14 +92,12 @@ public class FileService {
 	    
 		
 		for (DoacaoInput doador : jsonToDoador(text)) {
-//			System.out.println(toModel(doador).toString());
 			Doador d = toModel(doador);
 			d.setFile(file);
 			d.setData();
 			doadorRepository.save(d);
 		}
-	   	   
-		return new DataResponse();
+	   	
 	}
 	
 	public static List<DoacaoInput> jsonToDoador(String json) {
@@ -120,5 +118,4 @@ public class FileService {
 		return modelMapper.map(doador, Doador.class);
 	}
 	
-			
 }
