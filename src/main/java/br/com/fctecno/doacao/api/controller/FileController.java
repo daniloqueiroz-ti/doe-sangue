@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,14 +13,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.com.fctecno.doacao.api.model.DataResponse;
 import br.com.fctecno.doacao.domain.repository.DoadorRepository;
+import br.com.fctecno.doacao.domain.service.DoacaoService;
 import br.com.fctecno.doacao.domain.service.FileService;
 
 @RestController
 @RequestMapping("/api/file")
+@CrossOrigin("http://localhost:3000")
 public class FileController {
 	
 	@Autowired
 	private FileService fileService;
+	
+	@Autowired
+	private DoacaoService service;
 	
 	@Autowired
 	private DoadorRepository doadorRepo;
@@ -35,8 +41,9 @@ public class FileController {
 		DataResponse imcMedio = new DataResponse(doadorRepo.avgImcByFaixaIdade(), "Média de idade por tipo sanguíneo");
 		DataResponse perObesos  = new DataResponse("Percentual de obesos entre homens e mulheres", doadorRepo.percentObesosBySexo());
 		DataResponse avgIdadeTipo = new DataResponse("Média de idade por tipo sanguíneo", doadorRepo.avgIdadeByTipoSanguineo());
+		DataResponse qtePossiveis = new DataResponse("Quantidade de possíveis doadores", service.qtdePossiveisdoadores());
 		
-		result = List.of(qtdeDoador, imcMedio, perObesos, avgIdadeTipo);
+		result = List.of(qtdeDoador, imcMedio, perObesos, avgIdadeTipo, qtePossiveis);
 		
 		return result;
 	}
